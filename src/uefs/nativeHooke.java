@@ -1,5 +1,8 @@
 package uefs;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -13,21 +16,30 @@ public class NativeHooke implements NativeKeyListener {
 	
 	private long initTime = 0;
 	private long endTime = 0;
+	private int quantTestes;
+	static private FileWriter arquivo;
 	
 	private static ArrayList<Integer> senhaCode;
 	private static ArrayList<String> senhaCaractere;
 	private static ArrayList<Long> duracoes;
 	
-	public void init(){
+	public NativeHooke(int quantTestes){
+		this.quantTestes = quantTestes;
+	}
+	
+	public void init() throws IOException{
 		
 		try {
 			
-			GlobalScreen.registerNativeHook();
-			GlobalScreen.addNativeKeyListener(new NativeHooke());
+			System.err.println("Teste: " + quantTestes);
+			arquivo = new FileWriter("conjunto-teste.txt");
 			
 			senhaCode = new ArrayList<Integer>();
 			senhaCaractere = new ArrayList<String>();
 			duracoes = new ArrayList<Long>();
+			
+			GlobalScreen.registerNativeHook();
+			GlobalScreen.addNativeKeyListener(new NativeHooke(this.quantTestes));
 			
 			// Clear previous logging configurations.
 			LogManager.getLogManager().reset();
@@ -38,6 +50,7 @@ public class NativeHooke implements NativeKeyListener {
 			
 		} catch (NativeHookException ex) {
 			
+			arquivo.close();
 			System.err.println("There was a problem registering the native hook.");
 			System.err.println(ex.getMessage());
 			System.exit(1);
@@ -46,30 +59,65 @@ public class NativeHooke implements NativeKeyListener {
 	}
 
 
-	public void nativeKeyPressed(NativeKeyEvent e) {	
+	public void nativeKeyPressed(NativeKeyEvent e) {
 		
-		if(e.getKeyCode() != 28){ //Se não for enter
+		initTime = System.currentTimeMillis();
+		
+		if(e.getKeyCode() == 28){ //Se for enter
+			
+			//System.out.println("Enter pressionado");
+			this.quantTestes--;
+			//System.out.println("Teste: " + quantTestes);
+			
+			PrintWriter texto = new PrintWriter(arquivo);
+			//Salva no arquivo
+			texto.println("#");
+			for (String caractere : senhaCaractere) {
+				texto.print(caractere);
+			}
+			texto.print("\r\n");
+			for (Long duracao : duracoes) {
+				texto.print(duracao + " ");
+			}
+			texto.print("\r\n");
+			
+			if(this.quantTestes > 0){
+				
+				System.out.println("Repita a senha: ");
+				System.out.println("Quantidade de caracteres da senha: " + senhaCode.size());
+				System.out.println("Quantidade de entradas da rede: " + duracoes.size());
+				
+				senhaCode = new ArrayList<Integer>();
+				senhaCaractere = new ArrayList<String>();
+				duracoes = new ArrayList<Long>();
+				
+			}
+			else{
+				System.out.println("Ok, that is enough. Bora treinar a rede. ");
+				try {
+					arquivo.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				try {
+					GlobalScreen.unregisterNativeHook();
+					
+				} catch (NativeHookException e1) {
+					e1.printStackTrace();
+				}
+				//RedeNeural rede = new RedeNeural();
+				//rede.executa();
+			}	
+			
+		}
+		else if(e.getKeyCode() != NativeKeyEvent.VC_CAPS_LOCK && e.getKeyCode() != NativeKeyEvent.VC_BACKSPACE){
 			
 			int teclaPressionada = e.getKeyCode();
 			senhaCode.add(teclaPressionada);
 			senhaCaractere.add(NativeKeyEvent.getKeyText(teclaPressionada));
-			System.out.println("TECLA PRESSIONADA: " + NativeKeyEvent.getKeyText(teclaPressionada));
-			initTime = System.currentTimeMillis();
-			
-		}
-		else{
-			System.out.println("Enter pressionado. Fim da aplicação.");
-			System.out.println("Quantidade de caracteres da senha: " + senhaCode.size());
-			
-			RedeNeural rede = new RedeNeural(this.senhaCode, this.senhaCaractere, this.duracoes);
-			rede.executa();
-			
-			/*try {
-				GlobalScreen.unregisterNativeHook();
-				
-			} catch (NativeHookException e1) {
-				e1.printStackTrace();
-			}*/
+			//System.out.println("TECLA PRESSIONADA: " + NativeKeyEvent.getKeyText(teclaPressionada));
+
 		}
 		
 	}
@@ -78,15 +126,19 @@ public class NativeHooke implements NativeKeyListener {
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent e) {
 		
-		int teclaSolta = e.getKeyCode();
-		System.out.println("TECLA SOLTA: " + NativeKeyEvent.getKeyText(teclaSolta)); 	//imprime a tecla que foi pressionada
-		
 		endTime = System.currentTimeMillis();
 		
-		long duracao = endTime - initTime;
-		duracoes.add(duracao);
-		
-		System.out.println("Duração:   " + duracao); // imprime o valor do tempo depois que a tecla é solta
+		int teclaSolta = e.getKeyCode();
+		if(e.getKeyCode() != NativeKeyEvent.VC_CAPS_LOCK && e.getKeyCode() != NativeKeyEvent.VC_BACKSPACE){
+			
+			//System.out.println("TECLA SOLTA: " + NativeKeyEvent.getKeyText(teclaSolta)); 	//imprime a tecla que foi pressionada
+			
+			long duracao = endTime - initTime;
+			duracoes.add(duracao);
+			
+			//System.out.println("Duração:   " + duracao); // imprime o valor do tempo depois que a tecla é solta
+			
+		}
 		
 	}
 

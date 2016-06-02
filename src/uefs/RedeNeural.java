@@ -1,6 +1,5 @@
 package uefs;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.neuroph.core.NeuralNetwork;
@@ -11,16 +10,10 @@ import org.neuroph.util.TransferFunctionType;
 
 public class RedeNeural {
 	
-	private static ArrayList<Integer> senhaCode;
-	private static ArrayList<String> senhaCaractere;
-	private static ArrayList<Long> duracoes;
 	private DataSet conjuntoTreinamento;
 	
-	public RedeNeural(ArrayList<Integer> senhaCode, ArrayList<String> senhaCaractere, ArrayList<Long> duracoes){
-		
-		this.senhaCode = senhaCode;
-		this.senhaCaractere = senhaCaractere;
-		this.duracoes = duracoes;
+	public RedeNeural(){
+
 		
 		System.out.println("Inicializando atributos da rede neural");
 		
@@ -29,8 +22,8 @@ public class RedeNeural {
 	private void criaDataSet(){
 		
 		System.out.println("Criando conjunto de treinamento");
-		
-		this.conjuntoTreinamento = new DataSet(this.duracoes.size(), 1);
+		//LER DO ARQUIVO
+		//this.conjuntoTreinamento = new DataSet();
 		
 		//AINDA ESTOU FAZENDO...
 		
