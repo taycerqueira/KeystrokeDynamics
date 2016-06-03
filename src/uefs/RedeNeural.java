@@ -9,8 +9,12 @@ import java.util.Arrays;
 import java.util.Scanner;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.MultiLayerPerceptron;
+import org.neuroph.nnet.Perceptron;
+import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
+import org.neuroph.core.events.LearningEvent;
+import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.util.TransferFunctionType;
 
 public class RedeNeural {
@@ -33,7 +37,7 @@ public class RedeNeural {
 		
 		this.conjTreinamento = new DataSet(this.quantEntradas, 1);
 		
-		File arquivo = new File("conjunto-teste-oficial.txt");
+		File arquivo = new File("conjunto-teste-oficial-aleatorio.txt");
 		
 		System.out.println("Lendo arquivo...");
 		
@@ -60,7 +64,8 @@ public class RedeNeural {
 		    		entradas[i] = Integer.parseInt(valores[i]);
 		    	}
 		    	
-		    	int saida = Integer.parseInt(scan.nextLine());
+		    	//int saida = Integer.parseInt(scan.nextLine());
+		    	double saida = Double.parseDouble(scan.nextLine());
 		    	
 		    	this.conjTreinamento.addRow(new DataSetRow(entradas, new double[]{saida}));
 		    }
@@ -83,27 +88,41 @@ public class RedeNeural {
 		
 		criaDataSet();
 		
+		//System.out.println(this.conjTreinamento.getRowAt(0).toString());
+		
 		// create multi layer perceptron
 		
 		// ====> ERRO AQUI. AJUSTAR OS PARAMETROS
-		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.TANH, 2, 3, 1); 
+		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, this.quantEntradas, 10, 1); 
 		
 		// learn the training set
-		perceptron.learn(this.conjTreinamento);
-
-		// test perceptron
-		System.out.println("Testing trained neural network");
-		testNeuralNetwork(perceptron, this.conjTreinamento);
-
+		System.out.println("Treinando rede...");
+		//perceptron.learn(this.conjTreinamento);
+		
+        BackPropagation backPropagation = new BackPropagation();
+        
+        backPropagation.setMaxIterations(10);
+        //backPropagation.setMaxError(0.01);
+        
+        Listener listener = new Listener(perceptron, backPropagation);
+		
+		backPropagation.addListener(listener);
+		
+        perceptron.learn(this.conjTreinamento, backPropagation);
+		
 		// save trained neural network
 		perceptron.save("myMlPerceptron.nnet");
+
+		// test perceptron
+		//System.out.println("Testing trained neural network");
+		//testNeuralNetwork(neuralNetwork, this.conjTreinamento);
 
 		// load saved neural network
 		NeuralNetwork loadedMlPerceptron = NeuralNetwork.createFromFile("myMlPerceptron.nnet");
 
 		// test loaded neural network
-		System.out.println("Testing loaded neural network");
-		testNeuralNetwork(loadedMlPerceptron, this.conjTreinamento);
+		//System.out.println("Testing loaded neural network");
+		//testNeuralNetwork(loadedMlPerceptron, this.conjTreinamento);
 
 	}
 	
