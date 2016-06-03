@@ -1,7 +1,12 @@
 package uefs;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.core.data.DataSet;
@@ -10,12 +15,14 @@ import org.neuroph.util.TransferFunctionType;
 
 public class RedeNeural {
 	
-	private DataSet conjuntoTreinamento;
+	private DataSet conjTreinamento;
+	private int quantEntradas;
 	
-	public RedeNeural(){
-
+	public RedeNeural(int quantEntradas){
 		
-		System.out.println("Inicializando atributos da rede neural");
+		this.quantEntradas = quantEntradas;
+		
+		System.out.println("Inicializando rede neural...");
 		
 	}
 	
@@ -23,18 +30,50 @@ public class RedeNeural {
 		
 		System.out.println("Criando conjunto de treinamento");
 		//LER DO ARQUIVO
-		//this.conjuntoTreinamento = new DataSet();
 		
-		//AINDA ESTOU FAZENDO...
+		this.conjTreinamento = new DataSet(this.quantEntradas, 1);
 		
-		// create training set (logical XOR function)
-		DataSet trainingSet = new DataSet(2, 1); // Colocar para ser uma variável do tamanho da senha-1 para a entrada
-		trainingSet.addRow(new DataSetRow(new double[]{0, 0}, new double[]{0})); // o treinamento vai vim de um conjunto de dados
-																				 //
-		trainingSet.addRow(new DataSetRow(new double[]{0, 1}, new double[]{1}));
-		trainingSet.addRow(new DataSetRow(new double[]{1, 0}, new double[]{1}));
-		trainingSet.addRow(new DataSetRow(new double[]{1, 1}, new double[]{0}));
-
+		File arquivo = new File("conjunto-teste-oficial.txt");
+		
+		System.out.println("Lendo arquivo...");
+		
+		try(InputStream in = new FileInputStream(arquivo) ){
+			
+		  Scanner scan = new Scanner(in);
+		  
+		  while(scan.hasNext()){
+			  
+		    String linha = scan.nextLine();
+		    
+		    if(linha.equals("#")){
+		    	
+		    	String senha = scan.nextLine();
+		    	//System.out.println("Senha: " + senha);
+		    	
+		    	String intervalos = scan.nextLine();
+		    	String[] valores = intervalos.split(" ");
+		    	
+		    	double[] entradas = new double[senha.length()];
+		    	
+		    	for(int i = 0; i < valores.length; i++){
+		    		
+		    		entradas[i] = Integer.parseInt(valores[i]);
+		    	}
+		    	
+		    	int saida = Integer.parseInt(scan.nextLine());
+		    	
+		    	this.conjTreinamento.addRow(new DataSetRow(entradas, new double[]{saida}));
+		    }
+		    
+		  }
+		  
+		  scan.close();
+		  
+		  System.out.println("Arquivo lido com sucesso. \nConjunto de treinamento criado.");
+		  
+		}catch(IOException ex){
+		  ex.printStackTrace();
+		}
 
 	}
 
@@ -45,13 +84,16 @@ public class RedeNeural {
 		criaDataSet();
 		
 		// create multi layer perceptron
-		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.TANH, 2, 3, 1);
+		
+		// ====> ERRO AQUI. AJUSTAR OS PARAMETROS
+		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.TANH, 2, 3, 1); 
+		
 		// learn the training set
-		perceptron.learn(conjuntoTreinamento);
+		perceptron.learn(this.conjTreinamento);
 
 		// test perceptron
 		System.out.println("Testing trained neural network");
-		testNeuralNetwork(perceptron, conjuntoTreinamento);
+		testNeuralNetwork(perceptron, this.conjTreinamento);
 
 		// save trained neural network
 		perceptron.save("myMlPerceptron.nnet");
@@ -61,7 +103,7 @@ public class RedeNeural {
 
 		// test loaded neural network
 		System.out.println("Testing loaded neural network");
-		testNeuralNetwork(loadedMlPerceptron, conjuntoTreinamento);
+		testNeuralNetwork(loadedMlPerceptron, this.conjTreinamento);
 
 	}
 	
