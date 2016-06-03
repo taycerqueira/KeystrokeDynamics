@@ -19,6 +19,7 @@ public class NativeHooke implements NativeKeyListener {
 	private int quantTestes;
 	static private FileWriter arquivo;
 	private boolean primeiraTecla = true;
+	private boolean tipoSaida = false;
 	
 	private static ArrayList<Integer> senhaCode;
 	private static ArrayList<String> senhaCaractere;
@@ -95,7 +96,13 @@ public class NativeHooke implements NativeKeyListener {
 		//endTime = System.currentTimeMillis();
 		initTime = System.currentTimeMillis();
 		
-		if(e.getKeyCode() == 28){ //Se for enter
+		if(e.getKeyCode() == 28 && tipoSaida){
+			
+		}
+		
+		else if(e.getKeyCode() == 28){ //Se for enter
+			
+			primeiraTecla = true;
 			
 			primeiraTecla = true;
 			

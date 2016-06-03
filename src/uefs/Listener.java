@@ -24,7 +24,7 @@ public class Listener implements LearningEventListener {
 		}*/
 		
 		double erro = back.getPreviousEpochError();
-		System.out.println("Erro: " + erro);
+		//System.out.println("Erro: " + erro);
 	}
 
 }

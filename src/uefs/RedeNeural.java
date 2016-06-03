@@ -101,8 +101,8 @@ public class RedeNeural {
 		
         BackPropagation backPropagation = new BackPropagation();
         
-        backPropagation.setMaxIterations(10);
-        //backPropagation.setMaxError(0.01);
+        //backPropagation.setMaxIterations(100);
+        backPropagation.setLearningRate(0.01);
         
         Listener listener = new Listener(perceptron, backPropagation);
 		
@@ -114,8 +114,8 @@ public class RedeNeural {
 		perceptron.save("myMlPerceptron.nnet");
 
 		// test perceptron
-		//System.out.println("Testing trained neural network");
-		//testNeuralNetwork(neuralNetwork, this.conjTreinamento);
+		System.out.println("Testing trained neural network");
+		testNeuralNetwork(perceptron, this.conjTreinamento);
 
 		// load saved neural network
 		NeuralNetwork loadedMlPerceptron = NeuralNetwork.createFromFile("myMlPerceptron.nnet");
