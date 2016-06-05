@@ -2,13 +2,16 @@ package uefs;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
 import org.jfree.ui.RefineryUtilities;
+import org.neuroph.core.NeuralNetwork;
 
 
 public class Main {
@@ -19,17 +22,24 @@ public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		
+		//CAPTAURAR ENTRADAS
+		
 		/*try {
+			String nomeArquivo =  "conjunto-teste.txt";
 			boolean escreverFinalArquivo = true; //true = escreve no fim do arquivo | false = sobreescreve o arquivo
-			//NativeHooke capturaSenha = new NativeHooke(20, 0.9, escreverFinalArquivo); //para inserir testes verdadeiros
-			NativeHooke capturaSenha = new NativeHooke(15, 0.1, escreverFinalArquivo); //para inserir testes falsos
+			//NativeHooke capturaSenha = new NativeHooke(20, 0.9, nomeArquivo, escreverFinalArquivo); //para inserir testes verdadeiros
+			NativeHooke capturaSenha = new NativeHooke(15, 0.1, nomeArquivo,escreverFinalArquivo); //para inserir testes falsos
 			capturaSenha.init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-			
-		ArrayList<Registro> dados = getDataFromFile("conjunto-teste.txt");
+		
+		//TREINAR REDE
+		
+		boolean embaralhar = true;
+		ArrayList<Registro> dados = getDataFromFile("conjunto-teste.txt", embaralhar);
+		//salvaDadosArquivo(dados);
 		setConjuntos(dados, 0.6, 0.3, 0.1); //porcentagem de dados que serao destinados a cada conjunto
 		//Pega o tamanho da primeira senha pra passar a quantidade de entradas para a rede
 		int quantEntradas = dados.get(0).senha.length();
@@ -39,7 +49,7 @@ public class Main {
 
 	}
 	
-	private static ArrayList<Registro> getDataFromFile(String arquivo) throws FileNotFoundException, IOException{
+	private static ArrayList<Registro> getDataFromFile(String arquivo, boolean embaralhar) throws FileNotFoundException, IOException{
 		
 		ArrayList<Registro> dados = new ArrayList<Registro>();
 		ArrayList<Registro> dadosEmbaralhados = new ArrayList<Registro>();
@@ -57,7 +67,6 @@ public class Main {
 		    if(linha.equals("#")){
 		    	
 		    	String senha = scan.nextLine();
-		    	//System.out.println("Senha: " + senha);
 		    	
 		    	String intervalos = scan.nextLine();
 		    	String[] valores = intervalos.split(" ");
@@ -69,7 +78,6 @@ public class Main {
 		    		entradas[i] = Integer.parseInt(valores[i]);
 		    	}
 		    	
-		    	//int saida = Integer.parseInt(scan.nextLine());
 		    	double saida = Double.parseDouble(scan.nextLine());
 		    	
 		    	Registro registro = new Registro(senha, entradas, saida);
@@ -79,32 +87,38 @@ public class Main {
 		  }
 		  
 		  scan.close();
-		  
-		  //Embaralha os dados
-		  int tamanhoConjTreinamento = dados.size();
-			int[] ordem = new int[tamanhoConjTreinamento];
-			
-			ArrayList<Integer> numeros = new ArrayList<Integer>();
-			for (int i = 0; i < tamanhoConjTreinamento; i++) { 
-			    numeros.add(i);
-			}
-			//Embaralhamos os números:
-			Collections.shuffle(numeros);
-			//Adicionamos os números aleatórios no vetor
-			for (int i = 0; i < tamanhoConjTreinamento; i++) {
-				ordem[i] = numeros.get(i);
-			}
-			
-			//Cria um dataset com registros aleatórios
-			for(int i = 0; i < tamanhoConjTreinamento; i++){
-				int indice = ordem[i];
-				Registro registro = dados.get(indice);
-				dadosEmbaralhados.add(registro);
-			}
-		  
 		  System.out.println("Arquivo lido com sucesso. \nConjunto de treinamento criado.");
-		
-		  return dadosEmbaralhados;
+		  
+		  if(embaralhar){
+				  
+				//Embaralha os dados
+				int tamanhoConjTreinamento = dados.size();
+				int[] ordem = new int[tamanhoConjTreinamento];
+				
+				ArrayList<Integer> numeros = new ArrayList<Integer>();
+				for (int i = 0; i < tamanhoConjTreinamento; i++) { 
+				    numeros.add(i);
+				}
+				//Embaralhamos os números:
+				Collections.shuffle(numeros);
+				//Adicionamos os números aleatórios no vetor
+				for (int i = 0; i < tamanhoConjTreinamento; i++) {
+					ordem[i] = numeros.get(i);
+				}
+				
+				//Cria um dataset com registros aleatórios
+				for(int i = 0; i < tamanhoConjTreinamento; i++){
+					int indice = ordem[i];
+					Registro registro = dados.get(indice);
+					dadosEmbaralhados.add(registro);
+				}
+				
+				return dadosEmbaralhados;
+				  
+			  }
+		   else{
+			    return dados;
+		   }
 		
 		}
 	}
@@ -122,28 +136,41 @@ public class Main {
 		int te = (int) ((int)dados.size()*teste);
 		
 		int tamDados = dados.size();
-/*		System.out.println("tamDados " + tamDados);
-		System.out.println("tr " + tr);
-		System.out.println("va " + va);
-		System.out.println("te " + te);*/
 
 		for(int i = 0; i < tamDados; i++){	
 			if(tr >= 0){
 				tr--;
-				//System.out.println("tr: " + i);
 				conjTreinamento.add(dados.get(i));
 			}
 			else if(va >= 0){
 				va--;
-				//System.out.println("va: " + i);
 				conjValidacao.add(dados.get(i));
 				
 			}
 			else {
-				//System.out.println("te: " + i);	
 				conjTeste.add(dados.get(i));
 			}
 		}
+		
+	}
+	
+	private static void salvaDadosArquivo(ArrayList<Registro> dados) throws IOException{
+		
+		FileWriter arquivo = new FileWriter("treinamento.txt");
+		PrintWriter texto = new PrintWriter(arquivo);
+		
+		for (Registro registro : dados) {
+			texto.println("#");
+			texto.println(registro.senha);
+			for(int i = 0; i < registro.intervalos.length; i++){
+				texto.print((int)registro.intervalos[i] + " ");
+			}
+			texto.print("\r\n");
+			texto.println(registro.getSaida());
+		}
+		
+		texto.close();
+		arquivo.close();
 		
 	}
 	

@@ -1,11 +1,6 @@
 package uefs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
@@ -21,7 +16,6 @@ public class Listener implements LearningEventListener {
 	int valida;
 	int naoValida;
 	double erro= 0.0;
-	double mse = 0.0;
 	public Integer contIteracao = 0;
 	//public ArrayList<Double> erros;
 	//public ArrayList<Double> errosValidacao;
@@ -48,29 +42,29 @@ public class Listener implements LearningEventListener {
 		
 		String cont = contIteracao.toString();
 		
-		//System.out.println("ITERACAO: " + contIteracao);
+		System.out.println("\n=> ITERAÇÃO: " + contIteracao);
 		
 		Double[] pesos = rede.getWeights();
 		/*for(int i = 0; i < pesos.length; i++){
 			System.out.println("Peso: " + pesos[i]);
 		}*/
 		double erro = back.getPreviousEpochError();
-		//System.out.println("Erro: " + erro);
-		
+		System.out.println("Erro do Treinamento: " + erro);
 		erros.add(contIteracao.doubleValue(), erro); //Comentar essa linha se quiser que NÃO apareca o erro de treino no gráfico
 		
 		double erroValidacao = validacao();
-		//System.out.println("Erro da Validação: " + erroValidacao);
-		
+		System.out.println("Erro da Validação: " + erroValidacao);
 		errosValidacao.add(contIteracao.doubleValue(), erroValidacao); //Comentar essa linha se quiser que NÃO apareca o erro de validação no gráfico
 	}
 	
 	public double validacao (){
-		double mseFinal = 0.0;
+		
+		double mse = 0.0;
 		
 		valida = 0;
 		naoValida = 0;
 		erro = 0.0;
+		double somatorio = 0;
 		
 		//double[] saida = rede.getOutput();
 		//System.out.println("Saida : " + data.getRowAt(0).getDesiredOutput()[0]);
@@ -81,7 +75,7 @@ public class Listener implements LearningEventListener {
 			rede.setInput(dataRow.getInput());
 			rede.calculate();
 			
-			double[ ] saida = rede.getOutput();
+			double[] saida = rede.getOutput();
 			
 			//System.out.print("Entrada Validacao: " + Arrays.toString(dataRow.getInput()));
 			//System.out.println(" Output Validacao: " + Arrays.toString(saida) );
@@ -92,17 +86,20 @@ public class Listener implements LearningEventListener {
 			else if(data.getRowAt(0).getDesiredOutput()[0] == 0.1 && saida[0] <= 0.4) {
 				naoValida++;
 			}
-			erro=(Math.pow(dataRow.getDesiredOutput()[0],2)-Math.pow(saida[0],2));
-            mse=mse+erro;
+			
+			//erro = (Math.pow(dataRow.getDesiredOutput()[0],2) - Math.pow(saida[0],2));
+			erro = Math.pow((dataRow.getDesiredOutput()[0] - saida[0]), 2);
+			//System.out.println("erro validacao: " + erro);
+            somatorio += erro;
 			
 		}
 		
 		//System.out.println("Validas: " + valida);
 		//System.out.println("Nao Validas: " + naoValida);
+		mse = somatorio/data.size(); //colocar para ser o total de amostras
+		//System.out.println("erro total (mse): " + mse);
 		
-		mseFinal= mse/10; //colocar para ser o total de amostras
-		
-		return mseFinal;
+		return mse;
 		
 		//System.out.println("MSE: " + mseFinal);
 					

@@ -1,24 +1,16 @@
 package uefs;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Scanner;
 
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RefineryUtilities;
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.Perceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.core.data.DataSet;
 import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.events.LearningEvent;
-import org.neuroph.core.events.LearningEventListener;
 import org.neuroph.util.TransferFunctionType;
 
 public class RedeNeural {
@@ -72,11 +64,6 @@ public class RedeNeural {
 		
 		criaDataSets();
 		
-		//System.out.println(this.conjTreinamento.getRowAt(0).toString());
-		
-		// create multi layer perceptron
-		
-		// ====> ERRO AQUI. AJUSTAR OS PARAMETROS
 		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, this.quantEntradas, 10, 1); 
 		
 		// learn the training set
@@ -122,10 +109,9 @@ public class RedeNeural {
 
 	}
 	
-	
+	//Teste automatico
 	public static void testNeuralNetwork(NeuralNetwork nnet, DataSet testSet) {
 		
-		//Teste automatico:
 		for(DataSetRow dataRow : testSet.getRows()) {
 			
 			nnet.setInput(dataRow.getInput());
@@ -139,7 +125,6 @@ public class RedeNeural {
 			System.out.println("Output Desejada: " + dataRow.getDesiredOutput()[0]);
 		}
 		
-		//Teste manual: 
 
 	}
 
