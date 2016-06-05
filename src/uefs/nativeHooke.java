@@ -19,14 +19,21 @@ public class NativeHooke implements NativeKeyListener {
 	private int quantTestes;
 	static private FileWriter arquivo;
 	private boolean primeiraTecla = true;
-	private boolean tipoSaida = false;
+	private double outputEntrada;
+	private boolean escreverFinalArquivo;
+	private String nomeArquivo;
 	
 	private static ArrayList<Integer> senhaCode;
 	private static ArrayList<String> senhaCaractere;
 	private static ArrayList<Long> intervalos;
 	
-	public NativeHooke(int quantTestes){
+	private static NativeHooke keyListener;
+	
+	public NativeHooke(int quantTestes, double outputEntrada, String nomeArquivo, boolean escreverFinalArquivo){
 		this.quantTestes = quantTestes;
+		this.outputEntrada = outputEntrada;
+		this.nomeArquivo = nomeArquivo;
+		this.escreverFinalArquivo = escreverFinalArquivo;
 	}
 	
 	public void init() throws IOException{
@@ -34,14 +41,15 @@ public class NativeHooke implements NativeKeyListener {
 		try {
 			
 			//System.out.println("Teste: " + quantTestes);
-			arquivo = new FileWriter("conjunto-teste.txt");
+			arquivo = new FileWriter(nomeArquivo, escreverFinalArquivo);
 			
 			senhaCode = new ArrayList<Integer>();
 			senhaCaractere = new ArrayList<String>();
 			intervalos = new ArrayList<Long>();
 			
 			GlobalScreen.registerNativeHook();
-			GlobalScreen.addNativeKeyListener(new NativeHooke(this.quantTestes));
+			this.keyListener = new NativeHooke(this.quantTestes, this.outputEntrada, this.nomeArquivo, this.escreverFinalArquivo);
+			GlobalScreen.addNativeKeyListener(this.keyListener);
 			System.out.println("Insira sua senha: ");
 			
 			// Clear previous logging configurations.
@@ -96,13 +104,7 @@ public class NativeHooke implements NativeKeyListener {
 		//endTime = System.currentTimeMillis();
 		initTime = System.currentTimeMillis();
 		
-		if(e.getKeyCode() == 28 && tipoSaida){
-			
-		}
-		
-		else if(e.getKeyCode() == 28){ //Se for enter
-			
-			primeiraTecla = true;
+		if(e.getKeyCode() == 28){ //Se for enter
 			
 			primeiraTecla = true;
 			
@@ -110,7 +112,8 @@ public class NativeHooke implements NativeKeyListener {
 			this.quantTestes--;
 			//System.out.println("Teste: " + quantTestes);
 			
-			PrintWriter texto = new PrintWriter(arquivo);
+			PrintWriter texto = new PrintWriter(arquivo, escreverFinalArquivo);
+			
 			//Salva no arquivo
 			texto.println("#");
 			for (String caractere : senhaCaractere) {
@@ -121,7 +124,8 @@ public class NativeHooke implements NativeKeyListener {
 				texto.print(duracao + " ");
 			}
 			texto.print("\r\n");
-			texto.println("1"); //teste verdadeiro
+
+			texto.println(this.outputEntrada);
 			
 			if(this.quantTestes > 0){
 				
