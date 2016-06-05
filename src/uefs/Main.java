@@ -35,19 +35,22 @@ public class Main {
 			e.printStackTrace();
 		}*/
 		
+		
 		//TREINAR REDE
 		
 		/*boolean embaralhar = false;
 		ArrayList<Registro> dados = getDataFromFile("treinamento.txt", embaralhar);
 		//salvaDadosArquivo(dados);
-		setConjuntos(dados, 0.7, 0.0, 0.3); //porcentagem de dados que serao destinados a cada conjunto
+		setConjuntos(dados, 0.6, 0.2, 0.2); //porcentagem de dados que serao destinados a cada conjunto
 		//Pega o tamanho da primeira senha pra passar a quantidade de entradas para a rede
 		int quantEntradas = dados.get(0).senha.length();
 		//System.out.println("tamanho do vetor de entrada: " + quantEntradas);
 		RedeNeural rede = new RedeNeural(quantEntradas, conjTreinamento, conjValidacao, conjTeste); // 3 = quantidade de entradas. depende do tamanho da senha (quantidade de intervalos)
 		rede.executa();*/
 		
+		
 		//TESTAR REDE
+		
 		NeuralNetwork rede = NeuralNetwork.createFromFile("myMlPerceptron.nnet");
 		Senha teste = new Senha(rede, "REDESNEURAIS");
 		teste.capturarSenha();

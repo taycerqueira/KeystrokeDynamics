@@ -73,7 +73,8 @@ public class RedeNeural {
         BackPropagation backPropagation = new BackPropagation();
         
         //backPropagation.setMaxIterations(100);
-        backPropagation.setLearningRate(0.01);
+        //backPropagation.setLearningRate(0.01);
+        backPropagation.setMaxError(0.01);
         
         Listener listener = new Listener(perceptron, backPropagation, this.conjValidacao);
 		
