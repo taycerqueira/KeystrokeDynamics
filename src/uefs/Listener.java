@@ -52,9 +52,9 @@ public class Listener implements LearningEventListener {
 		System.out.println("Erro do Treinamento: " + erro);
 		erros.add(contIteracao.doubleValue(), erro); //Comentar essa linha se quiser que NÃO apareca o erro de treino no gráfico
 		
-		double erroValidacao = validacao();
-		System.out.println("Erro da Validação: " + erroValidacao);
-		errosValidacao.add(contIteracao.doubleValue(), erroValidacao); //Comentar essa linha se quiser que NÃO apareca o erro de validação no gráfico
+		//double erroValidacao = validacao();
+		//System.out.println("Erro da Validação: " + erroValidacao);
+		//errosValidacao.add(contIteracao.doubleValue(), erroValidacao); //Comentar essa linha se quiser que NÃO apareca o erro de validação no gráfico
 	}
 	
 	public double validacao (){

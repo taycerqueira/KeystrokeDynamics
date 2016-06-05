@@ -64,7 +64,7 @@ public class RedeNeural {
 		
 		criaDataSets();
 		
-		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, this.quantEntradas, 10, 1); 
+		MultiLayerPerceptron perceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, this.quantEntradas, 50, 1); 
 		
 		// learn the training set
 		System.out.println("Treinando rede...");
@@ -112,6 +112,10 @@ public class RedeNeural {
 	//Teste automatico
 	public static void testNeuralNetwork(NeuralNetwork nnet, DataSet testSet) {
 		
+		double mse = 0;
+		double somatorio = 0;
+		double erro = 0;
+		
 		for(DataSetRow dataRow : testSet.getRows()) {
 			
 			nnet.setInput(dataRow.getInput());
@@ -123,7 +127,14 @@ public class RedeNeural {
 			System.out.println("Input: " + Arrays.toString(dataRow.getInput()) );
 			System.out.println("Output: " + Arrays.toString(networkOutput) );
 			System.out.println("Output Desejada: " + dataRow.getDesiredOutput()[0]);
+			
+			erro = Math.pow((dataRow.getDesiredOutput()[0] - networkOutput[0]), 2);
+			//System.out.println("erro validacao: " + erro);
+            somatorio += erro;
 		}
+		
+        mse = somatorio/testSet.size(); //colocar para ser o total de amostras
+		System.out.println("MSE (Teste): " + mse);
 		
 
 	}

@@ -25,7 +25,7 @@ public class RedeKohonen {
 		BufferedImage image = null;
         
         try {
-            image = ImageIO.read(new File("teste3.png"));
+            image = ImageIO.read(new File("teste.png"));
             //image = ImageIO.read(new File("inu.jpg"));
         } catch (IOException e) {
             System.out.println("Não foi possivel abrir a imagem");
@@ -42,12 +42,14 @@ public class RedeKohonen {
             for (int x = 0; x < image.getWidth(); x++) {
                 rgb = getPixelRGB(image.getRGB(x, y));
                
-                trainingSet.addRow(new DataSetRow(r[x+y] = rgb[0], g[x+y] = rgb[1],b[x+y] = rgb[2] ));
+                trainingSet.addRow(new DataSetRow(r[x+y] = rgb[0], g[x+y] = rgb[1], b[x+y] = rgb[2]));
                // System.out.println("R: " + r[x] + " G: " + g[x] + " B: " + b[x] );
             }
         }
+        System.out.println("tamConjTreinamento: " + trainingSet.size());
+        
 				// create kohonen
-				Kohonen kohonen = new Kohonen(3,50);
+				Kohonen kohonen = new Kohonen(3,10);
 				// 
 				
 				// learn the training set
@@ -62,7 +64,10 @@ public class RedeKohonen {
 				
 				//System.out.println(">>Testing" + kohonen.getOutput()[0]);
 				//System.out.println(" Output: " +kl.getMapSize() );
-				System.out.println(" Output: " +Arrays.toString(kohonen.getOutput()) );
+				//System.out.println(" Output: " +Arrays.toString(kohonen.getOutput()) );
+				for(int i = 0; i < kohonen.getOutput().length; i++){
+					System.out.println(kohonen.getOutput()[i]);
+				}
 				
 				//System.out.println(" Output: " + neuron[0].getOutput());
 				
